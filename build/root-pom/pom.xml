@@ -7,16 +7,9 @@
     <packaging>pom</packaging>        
     
     <properties>
-        <!-- Plugin version -->
+
         <org.apache.maven.plugins.version>3.1</org.apache.maven.plugins.version>
-       
-        
-        <!-- Global configuration> -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        
-        <!-- Mist 
-        <version>${org.apache.maven.plugins.version}</version> <version>2.3</version>
-        -->
     </properties>
 
     <build>
@@ -48,7 +41,7 @@
                     </configuration>
                 </plugin>
                 
-                
+                <!-- Create full jar -->
                 <plugin>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <configuration>
@@ -70,6 +63,80 @@
                             <phase>package</phase>
                             <goals>
                                 <goal>single</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                
+                
+                <!-- Flyway for DB -->
+                <plugin>
+                    <groupId>org.flywaydb</groupId>
+                    <artifactId>flyway-maven-plugin</artifactId>
+                    <version>4.2.0</version>
+                    <configuration>
+                        <url>${project.jdbc.connection}</url>
+                        <user>${project.jdbc.user}</user>
+                        <password>${project.jdbc.password}</password>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.postgresql</groupId>
+                            <artifactId>postgresql</artifactId>
+                            <version>42.1.4</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                
+                <!-- Instrument Java-lite -->
+                <plugin>
+                    <groupId>org.javalite</groupId>
+                    <artifactId>activejdbc-instrumentation</artifactId>
+                    <version>1.4.13</version>
+                    <executions>
+                        <execution>
+                            <phase>process-classes</phase>
+                            <goals>
+                                <goal>instrument</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                
+                <!-- Aspect J -->  
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>aspectj-maven-plugin</artifactId>
+                    <version>1.7</version>
+                    <configuration>
+                        <complianceLevel>1.8</complianceLevel>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                        <showWeaveInfo>true</showWeaveInfo>
+                        <verbose>true</verbose>
+                        <Xlint>ignore</Xlint>
+                        <encoding>UTF-8 </encoding>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>compile</goal>
+                                <goal>test-compile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                
+                <!-- read properties -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>properties-maven-plugin</artifactId>
+                    <version>1.0.0</version>
+                    <executions>
+                        <execution>
+                            <phase>initialize</phase>
+                            <goals>
+                                <goal>read-project-properties</goal>
                             </goals>
                         </execution>
                     </executions>
